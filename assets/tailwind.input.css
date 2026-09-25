@@ -25,11 +25,11 @@ body {
 }
 
 .page {
-  @apply relative z-[2] mx-auto flex min-h-screen w-full max-w-[1100px] flex-col p-7;
+  @apply relative z-[2] mx-auto flex min-h-screen w-full max-w-[1100px] flex-col px-7 pt-[76px] pb-[80px];
 }
 
 .site-header {
-  @apply relative z-10 flex items-center justify-between;
+  @apply fixed top-0 left-1/2 z-30 flex w-full max-w-[1100px] -translate-x-1/2 items-center justify-between bg-[#050505]/85 px-7 py-4 backdrop-blur-xl;
 }
 
 .logo {
@@ -81,7 +81,7 @@ body {
 }
 
 .site-footer {
-  @apply mt-[80px] flex justify-between py-[25px] text-[9px] tracking-[.15em] text-[#555];
+  @apply fixed bottom-0 left-1/2 z-30 flex w-full max-w-[1100px] -translate-x-1/2 items-center justify-between gap-4 bg-[#050505]/90 px-7 py-3 text-[9px] tracking-[.15em] text-[#777] backdrop-blur-xl;
 }
 
 @media (max-width: 900px) {
@@ -92,7 +92,15 @@ body {
 
 @media (max-width: 500px) {
   .page {
-    @apply p-[22px];
+    @apply px-[22px] pt-[70px] pb-[72px];
+  }
+
+  .site-header {
+    @apply px-[22px];
+  }
+
+  .site-footer {
+    @apply gap-2 px-[22px] py-3 text-[8px];
   }
 
   .hero {

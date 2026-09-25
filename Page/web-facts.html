@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A few public numbers and facts about this website.">
+    <title>SPACE — Web Facts</title>
+    <link rel="stylesheet" href="../assets/tailwind.css">
+</head>
+<body>
+    <div class="bg">
+        <canvas id="particles"></canvas>
+        <div class="bg-grid"></div>
+        <div class="bg-vignette"></div>
+        <div class="bg-noise"></div>
+    </div>
+
+    <div class="page">
+        <header class="site-header">
+            <a href="../index.html" class="logo">SPACE</a>
+            <a href="library.html" class="header-link">← LIBRARY</a>
+        </header>
+
+        <main class="web-facts-main">
+            <section class="web-facts-hero">
+                <span class="eyebrow">LOXSPACE / LIVE STATS</span>
+                <h1 class="display-title">WEB<br><span>FACTS.</span></h1>
+                <p class="body-text">A few numbers from this little corner of the internet.</p>
+            </section>
+
+            <section class="web-facts-grid" aria-label="Website facts">
+                <article class="web-fact-card">
+                    <span class="web-fact-label">PUBLIC PAGES</span>
+                    <strong class="web-fact-value" id="fact-pages">—</strong>
+                    <span class="web-fact-detail">Pages available on the live site.</span>
+                </article>
+                <article class="web-fact-card">
+                    <span class="web-fact-label">BLOG POSTS</span>
+                    <strong class="web-fact-value" id="fact-blogs">—</strong>
+                    <span class="web-fact-detail">Posts currently in the library.</span>
+                </article>
+                <article class="web-fact-card">
+                    <span class="web-fact-label">PROJECTS</span>
+                    <strong class="web-fact-value" id="fact-projects">—</strong>
+                    <span class="web-fact-detail">Projects with their own page.</span>
+                </article>
+                <article class="web-fact-card web-fact-card-wide">
+                    <span class="web-fact-label">LAST PRODUCTION UPDATE</span>
+                    <strong class="web-fact-value web-fact-date" id="fact-updated">—</strong>
+                    <span class="web-fact-detail" id="fact-update-detail">Updated whenever a new production build goes live.</span>
+                </article>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <span>SPACE / WEB FACTS</span>
+            <span>EST. 2026</span>
+        </footer>
+    </div>
+
+    <script src="../assets/particles.js"></script>
+    <script>
+        const formatCount = value => new Intl.NumberFormat().format(value);
+        const setFact = (id, value) => {
+            document.getElementById(id).textContent = value;
+        };
+
+        fetch("web-facts.json", { cache: "no-store" })
+            .then(response => {
+                if (!response.ok) throw new Error("Stats are not available.");
+                return response.json();
+            })
+            .then(facts => {
+                setFact("fact-pages", formatCount(facts.publicPages));
+                setFact("fact-blogs", formatCount(facts.blogPosts));
+                setFact("fact-projects", formatCount(facts.projects));
+
+                if (facts.lastProductionUpdate) {
+                    const updated = new Date(facts.lastProductionUpdate);
+                    setFact("fact-updated", new Intl.DateTimeFormat(undefined, {
+                        dateStyle: "medium",
+                        timeStyle: "short"
+                    }).format(updated));
+                } else {
+                    setFact("fact-updated", "Not recorded yet");
+                    document.getElementById("fact-update-detail").textContent = "The date will show after the first Netlify production build.";
+                }
+            })
+            .catch(() => {
+                ["fact-pages", "fact-blogs", "fact-projects", "fact-updated"].forEach(id => setFact(id, "Unavailable"));
+            });
+    </script>
+</body>
+</html>

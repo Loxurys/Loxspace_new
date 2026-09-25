@@ -14,6 +14,7 @@
     --text-sm--line-height: calc(1.25 / 0.875);
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
+    --blur-xl: 24px;
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
@@ -524,6 +525,88 @@
   padding: 48px 0 54px;
   border-bottom: 1px solid var(--line);
   scroll-margin-top: 28px;
+}
+.footer-archive {
+  color: #858585;
+  font-size: 9px;
+  letter-spacing: .14em;
+  transition: color .2s ease;
+}
+.footer-archive:hover {
+  color: #cce3ff;
+}
+.article-footer {
+  gap: 18px;
+}
+.web-facts-main {
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
+.web-facts-hero {
+  padding: clamp(48px, 9vh, 88px) 0 36px;
+}
+.web-facts-hero .display-title {
+  font-size: clamp(62px, 10vw, 108px);
+}
+.web-facts-hero .body-text {
+  margin-top: 24px;
+}
+.web-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.web-fact-card {
+  display: flex;
+  min-width: 0;
+  min-height: 160px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 4px;
+  background: rgba(255,255,255,.018);
+}
+.web-fact-card-wide {
+  grid-column: 1 / -1;
+  min-height: 138px;
+}
+.web-fact-label {
+  color: #777;
+  font-size: 9px;
+  letter-spacing: .18em;
+}
+.web-fact-value {
+  max-width: 100%;
+  color: #f2f2f2;
+  font-size: clamp(38px, 7vw, 58px);
+  line-height: 1;
+  letter-spacing: -.06em;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.web-fact-date {
+  font-size: clamp(20px, 4vw, 30px);
+  letter-spacing: -.035em;
+}
+.web-fact-detail {
+  color: #828282;
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (max-width: 560px) {
+  .web-facts-grid {
+    grid-template-columns: 1fr;
+  }
+  .web-fact-card-wide {
+    grid-column: auto;
+  }
+  .web-fact-card {
+    min-height: 145px;
+    padding: 17px;
+  }
 }
 .blog-list {
   margin-top: 8px;
@@ -1103,7 +1186,7 @@
 }
 .maker-preview {
   position: sticky;
-  top: 20px;
+  top: 88px;
   align-self: start;
 }
 .maker-preview-content {
@@ -1155,14 +1238,28 @@ body {
   width: 100%;
   max-width: 1100px;
   flex-direction: column;
-  padding: calc(var(--spacing) * 7);
+  padding-inline: calc(var(--spacing) * 7);
+  padding-top: 76px;
+  padding-bottom: 80px;
 }
 .site-header {
-  position: relative;
-  z-index: 10;
+  position: fixed;
+  top: 0px;
+  left: calc(1 / 2 * 100%);
+  z-index: 30;
   display: flex;
+  width: 100%;
+  max-width: 1100px;
+  --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
+  translate: var(--tw-translate-x) var(--tw-translate-y);
   align-items: center;
   justify-content: space-between;
+  background-color: color-mix(in oklab, #050505 85%, transparent);
+  padding-inline: calc(var(--spacing) * 7);
+  padding-block: calc(var(--spacing) * 4);
+  --tw-backdrop-blur: blur(var(--blur-xl));
+  -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
 }
 .logo {
   font-size: 13px;
@@ -1271,14 +1368,28 @@ body {
   background-color: transparent;
 }
 .site-footer {
-  margin-top: 80px;
+  position: fixed;
+  bottom: 0px;
+  left: calc(1 / 2 * 100%);
+  z-index: 30;
   display: flex;
+  width: 100%;
+  max-width: 1100px;
+  --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
+  translate: var(--tw-translate-x) var(--tw-translate-y);
+  align-items: center;
   justify-content: space-between;
-  padding-block: 25px;
+  gap: calc(var(--spacing) * 4);
+  background-color: color-mix(in oklab, #050505 90%, transparent);
+  padding-inline: calc(var(--spacing) * 7);
+  padding-block: calc(var(--spacing) * 3);
   font-size: 9px;
   --tw-tracking: .15em;
   letter-spacing: .15em;
-  color: #555;
+  color: #777;
+  --tw-backdrop-blur: blur(var(--blur-xl));
+  -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
 }
 @media (max-width: 900px) {
   .nav-grid {
@@ -1287,7 +1398,18 @@ body {
 }
 @media (max-width: 500px) {
   .page {
-    padding: 22px;
+    padding-inline: 22px;
+    padding-top: 70px;
+    padding-bottom: 72px;
+  }
+  .site-header {
+    padding-inline: 22px;
+  }
+  .site-footer {
+    gap: calc(var(--spacing) * 2);
+    padding-inline: 22px;
+    padding-block: calc(var(--spacing) * 3);
+    font-size: 8px;
   }
   .hero {
     padding-top: 75px;
@@ -1352,6 +1474,57 @@ body {
   initial-value: 100%;
 }
 @property --tw-drop-shadow-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-translate-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-translate-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-translate-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-backdrop-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-sepia {
   syntax: "*";
   inherits: false;
 }
@@ -1461,6 +1634,18 @@ body {
       --tw-drop-shadow-color: initial;
       --tw-drop-shadow-alpha: 100%;
       --tw-drop-shadow-size: initial;
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      --tw-translate-z: 0;
+      --tw-backdrop-blur: initial;
+      --tw-backdrop-brightness: initial;
+      --tw-backdrop-contrast: initial;
+      --tw-backdrop-grayscale: initial;
+      --tw-backdrop-hue-rotate: initial;
+      --tw-backdrop-invert: initial;
+      --tw-backdrop-opacity: initial;
+      --tw-backdrop-saturate: initial;
+      --tw-backdrop-sepia: initial;
       --tw-font-weight: initial;
       --tw-tracking: initial;
       --tw-duration: initial;

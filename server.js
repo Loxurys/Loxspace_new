@@ -230,9 +230,9 @@ function articlePage(post, index, type = "blogs") {
     return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="${metaDescription}"><title>SPACE — ${title}</title><link rel="stylesheet" href="../../assets/tailwind.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"></head>
 <body><div class="bg"><canvas id="particles"></canvas><div class="bg-grid"></div><div class="bg-vignette"></div><div class="bg-noise"></div></div>
-<div class="page"><header class="site-header"><a href="../../index.html" class="logo">SPACE</a><a href="../${collection.indexHref}" class="header-link">← ${collection.label}</a></header>
-<main class="blog-page"><article class="blog-post"><div class="blog-meta"><span>${String(index + 1).padStart(2, "0")}</span><span>${category}</span><span>${date}</span><span>${readingTime(post.content)} min read</span></div><h1 class="blog-title">${title}</h1><div class="blog-copy">${renderContent(post.content)}</div></article>${commentSection(post, collection.type)}<a href="../${collection.indexHref}" class="blog-back">← All ${collection.type}</a></main>
-<footer class="site-footer"><span>SPACE / ${collection.type.toUpperCase()}</span><span>EST. 2026</span></footer></div>
+<div class="page"><header class="site-header article-header"><a href="../../index.html" class="logo">SPACE</a><a href="../${collection.indexHref}" class="header-link">← ${collection.label}</a></header>
+<main class="blog-page"><article class="blog-post"><div class="blog-meta"><span>${String(index + 1).padStart(2, "0")}</span><span>${category}</span><span>${date}</span><span>${readingTime(post.content)} min read</span></div><h1 class="blog-title">${title}</h1><div class="blog-copy">${renderContent(post.content)}</div></article>${commentSection(post, collection.type)}</main>
+<footer class="site-footer article-footer"><span>SPACE / ${collection.type.toUpperCase()}</span><a href="../${collection.indexHref}" class="footer-archive">← ALL ${collection.type.toUpperCase()}</a><span>EST. 2026</span></footer></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"><\/script><script src="../../assets/particles.js"><\/script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"><\/script><script>document.querySelectorAll('.blog-copy pre code').forEach(block => window.hljs?.highlightElement(block));<\/script></body></html>`;
 }
 
