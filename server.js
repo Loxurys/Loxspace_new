@@ -120,15 +120,14 @@ function collectionConfig(type = "blogs") {
 function commentSection(post, type) {
     const kind = type === "projects" ? "project" : "blog";
     return `<section class="comments-section" id="comments" data-type="${kind}" data-slug="${escapeHtml(post.slug)}">
-<h2>Comments <span class="comments-count" id="comments-count">0</span></h2>
+<div class="comments-heading"><div><span class="comments-eyebrow">JOIN THE CONVERSATION</span><h2>Comments <span class="comments-count" id="comments-count">0</span></h2><p class="comments-description">Got a thought? Drop it here.</p></div><span class="comments-note">NO ACCOUNT NEEDED</span></div>
 <form class="comments-form" id="comments-form">
-<label class="comments-field">Name<input name="name" maxlength="48" autocomplete="nickname" required></label>
-<label class="comments-field">Comment<textarea name="message" maxlength="1200" rows="4" required></textarea></label>
+<div class="comments-form-fields"><label class="comments-field">Name<input name="name" maxlength="48" autocomplete="nickname" placeholder="Your name" required></label>
+<label class="comments-field">Comment<textarea name="message" maxlength="1200" rows="4" placeholder="Write something…" required></textarea></label></div>
 <label class="comments-honeypot" aria-hidden="true">Leave this blank<input name="website" tabindex="-1" autocomplete="off"></label>
-<button class="comments-submit" type="submit">POST COMMENT ↗</button>
-<p class="comments-status" id="comments-status" role="status">No account needed.</p>
+<div class="comments-form-footer"><p class="comments-status" id="comments-status" role="status">Keep it kind, keep it real.</p><div class="comments-form-actions"><span class="comments-char-count"><span id="comments-char-count">0</span> / 1200</span><button class="comments-submit" type="submit">POST COMMENT <span aria-hidden="true">↗</span></button></div></div>
 </form>
-<ol class="comments-list" id="comments-list"></ol>
+<ol class="comments-list" id="comments-list" aria-label="Comments"></ol>
 </section>
 <script>
 (() => {
@@ -137,6 +136,8 @@ function commentSection(post, type) {
     const list = document.getElementById("comments-list");
     const status = document.getElementById("comments-status");
     const count = document.getElementById("comments-count");
+    const messageField = form.elements.message;
+    const characterCount = document.getElementById("comments-char-count");
     const query = new URLSearchParams({ type: section.dataset.type, slug: section.dataset.slug });
     const endpoint = "/.netlify/functions/comments?" + query;
 
@@ -150,7 +151,7 @@ function commentSection(post, type) {
             if (!comments.length) {
                 const empty = document.createElement("li");
                 empty.className = "comments-empty";
-                empty.textContent = "No comments yet.";
+                empty.textContent = "Nothing here yet. Start the conversation.";
                 list.append(empty);
                 return;
             }
@@ -175,6 +176,10 @@ function commentSection(post, type) {
         }
     }
 
+    messageField.addEventListener("input", () => {
+        characterCount.textContent = String(messageField.value.length);
+    });
+
     form.addEventListener("submit", async event => {
         event.preventDefault();
         const button = form.querySelector("button[type=submit]");
@@ -190,6 +195,7 @@ function commentSection(post, type) {
             const result = await response.json();
             if (!response.ok || !result.ok) throw new Error(result.error || "Could not send comment.");
             form.reset();
+            characterCount.textContent = "0";
             status.textContent = "Comment posted.";
             await loadComments();
         } catch (error) {
