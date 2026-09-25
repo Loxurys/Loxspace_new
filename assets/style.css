@@ -1300,6 +1300,35 @@
     background: rgba(64,156,255,.08);
 }
 
+.not-found-main {
+    display: grid;
+    flex: 1;
+    min-height: min(68vh, 620px);
+    place-items: center;
+    padding: 48px 0;
+}
+
+.not-found-content {
+    width: 100%;
+    text-align: center;
+}
+
+.not-found-content .display-title {
+    font-size: clamp(64px, 12vw, 112px);
+}
+
+.not-found-content .body-text {
+    margin: 24px auto 0;
+}
+
+.not-found-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+}
+
 @media (max-width: 380px) {
     .about-actions {
         width: 100%;
@@ -1308,6 +1337,10 @@
 
     .about-link {
         width: 100%;
+    }
+
+    .not-found-actions {
+        flex-direction: column;
     }
 }
 

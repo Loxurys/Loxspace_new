@@ -281,6 +281,20 @@ async function readJsonBody(request) {
     return JSON.parse(body || "{}");
 }
 
+async function sendNotFound(request, response) {
+    try {
+        const notFoundPage = await fs.readFile(path.join(root, "404.html"), "utf8");
+        response.writeHead(404, {
+            "Content-Type": "text/html; charset=utf-8",
+            "X-Content-Type-Options": "nosniff"
+        });
+        if (request.method === "HEAD") response.end();
+        else response.end(notFoundPage);
+    } catch {
+        send(response, 404, "Not found", "text/plain; charset=utf-8");
+    }
+}
+
 function normalizePosts(value) {
     if (!Array.isArray(value) || value.length > 500) throw new Error("Expected a list of up to 500 posts.");
     const seen = new Set();
@@ -340,8 +354,12 @@ async function serveFile(request, response, pathname) {
     const filePath = path.resolve(root, `.${requested}`);
     const relative = path.relative(root, filePath);
     const topLevel = relative.split(path.sep)[0];
-    if (relative.startsWith("..") || path.isAbsolute(relative) || !["index.html", "Page", "assets"].includes(topLevel)) {
+    if (relative.startsWith("..") || path.isAbsolute(relative)) {
         send(response, 404, "Not found", "text/plain; charset=utf-8");
+        return;
+    }
+    if (!["index.html", "404.html", "Page", "assets"].includes(topLevel)) {
+        await sendNotFound(request, response);
         return;
     }
     try {
@@ -352,7 +370,7 @@ async function serveFile(request, response, pathname) {
         if (request.method === "HEAD") response.end();
         else response.end(await fs.readFile(filePath));
     } catch {
-        send(response, 404, "Not found", "text/plain; charset=utf-8");
+        await sendNotFound(request, response);
     }
 }
 

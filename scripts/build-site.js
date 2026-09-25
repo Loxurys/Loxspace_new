@@ -44,6 +44,7 @@ async function main() {
     await fs.rm(output, { recursive: true, force: true });
     await fs.mkdir(output, { recursive: true });
     await fs.copyFile(path.join(root, "index.html"), path.join(output, "index.html"));
+    await fs.copyFile(path.join(root, "404.html"), path.join(output, "404.html"));
     await copyTree(path.join(root, "assets"), path.join(output, "assets"), "assets");
     await copyTree(path.join(root, "Page"), path.join(output, "Page"), "Page");
 
