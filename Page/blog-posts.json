@@ -1,0 +1,11 @@
+[
+  {
+    "slug": "testing",
+    "title": "Testing",
+    "date": "2026-09-25",
+    "category": "test",
+    "readingTime": 1,
+    "excerpt": "hello",
+    "content": "Hello World\n'''java\nSystem.out.println(\"java\");\n'''\n'''c++\ncout>>\"cpp\";\n'''\n'''python\nprint(\"python\")\n'''\n\n@[video](https://www.youtube.com/shorts/WVtQbniRV8M)\n\n![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBB80ukEtJtxGarEsZeyhuD60rFmMVAcoG3AKT_C9stQ&s=10)"
+  }
+]

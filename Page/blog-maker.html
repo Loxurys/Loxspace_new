@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Write and publish static blog and project pages for SPACE.">
+<title>SPACE — Blog &amp; Project Maker</title>
+<link rel="stylesheet" href="../assets/tailwind.css">
+</head>
+<body>
+<div class="bg"><div class="bg-grid"></div><div class="bg-vignette"></div><div class="bg-noise"></div></div>
+<div class="page">
+    <header class="site-header">
+        <a href="../index.html" class="logo">SPACE</a>
+        <a href="blog.html" class="header-link">← BLOG LIBRARY</a>
+    </header>
+
+    <main class="maker-main">
+        <section class="maker-heading">
+            <span class="eyebrow">LOCAL TOOL / WRITING</span>
+            <h1>Blog &amp; Project Maker<span>.</span></h1>
+            <p>Write here, preview the page, then generate the article files and its separate library. Everything stays as regular files in this site. No database.</p>
+            <p>Only I can make posts here. The Maker runs locally and is just for my own use.</p>
+        </section>
+
+        <div class="maker-toolbar">
+            <select id="content-type" aria-label="Choose Blog or Project">
+                <option value="blogs">Blog</option>
+                <option value="projects">Project</option>
+            </select>
+            <select id="post-picker" aria-label="Choose an article" disabled>
+                <option value="">Choose an article</option>
+            </select>
+            <button type="button" class="maker-button" id="new-post" disabled>New article</button>
+            <button type="button" class="maker-button primary" id="generate" disabled>Save &amp; generate HTML</button>
+        </div>
+
+        <p class="maker-status" id="maker-status" role="status">Loading local posts…</p>
+
+        <div class="maker-workspace">
+            <form class="maker-form" id="post-form">
+                <div class="maker-field">
+                    <label for="post-title">Title</label>
+                    <input id="post-title" name="title" maxlength="120" placeholder="Give the post a title" required>
+                </div>
+                <div class="maker-field">
+                    <label for="post-slug">Page name</label>
+                    <input id="post-slug" name="slug" maxlength="80" placeholder="auto-from-title" required>
+                    <span class="maker-hint">Used in the article address. Lowercase letters and dashes work best.</span>
+                </div>
+                <div class="maker-field">
+                    <label for="post-category">Category</label>
+                    <input id="post-category" name="category" maxlength="40" placeholder="Ideas, design, notes…">
+                </div>
+                <div class="maker-field">
+                    <label for="post-date">Date</label>
+                    <input id="post-date" name="date" type="date">
+                </div>
+                <div class="maker-field">
+                    <label for="post-excerpt">Short intro</label>
+                    <textarea id="post-excerpt" name="excerpt" rows="3" maxlength="220" placeholder="A short description shown in the Blog Library."></textarea>
+                </div>
+                <div class="maker-field">
+                    <label for="post-content">Article</label>
+                    <textarea id="post-content" name="content" placeholder="Write your post here. Leave a blank line between paragraphs. Start a line with ## to make a section heading." required></textarea>
+                    <span class="maker-hint">Blank line = new paragraph. Use ## for headings, ![caption](image URL) for photos, @[video](YouTube or MP4/WebM URL) for videos, and ``` or ''' plus a language name for highlighted code.</span>
+                </div>
+                <div class="maker-field maker-media-tools">
+                    <label>Insert media</label>
+                    <input id="media-image-url" type="url" placeholder="Photo URL — https://…" aria-label="Photo URL">
+                    <input id="media-image-caption" type="text" placeholder="Photo caption (optional)" aria-label="Photo caption">
+                    <button class="maker-button" type="button" id="insert-image">Insert photo</button>
+                    <input id="media-video-url" type="url" placeholder="Video file URL — MP4 or WebM" aria-label="Video URL">
+                    <button class="maker-button" type="button" id="insert-video">Insert video</button>
+                    <span class="maker-hint">Paste a direct media URL, then insert it wherever your cursor is in the article.</span>
+                </div>
+            </form>
+
+            <section class="maker-preview" aria-label="Article preview">
+                <span class="maker-preview-label">Live preview</span>
+                <div class="maker-preview-content" id="preview-content"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer"><span>SPACE / MAKER</span><span>POWERED BY BLOGGER</span></footer>
+</div>
+
+<script>
+const form = document.getElementById("post-form");
+const statusLine = document.getElementById("maker-status");
+const picker = document.getElementById("post-picker");
+const typePicker = document.getElementById("content-type");
+const generateButton = document.getElementById("generate");
+const newButton = document.getElementById("new-post");
+const titleInput = document.getElementById("post-title");
+const slugInput = document.getElementById("post-slug");
+const preview = document.getElementById("preview-content");
+const contentInput = document.getElementById("post-content");
+
+let posts = [];
+let activeSlug = null;
+let isNewPost = false;
+let slugWasEdited = false;
+let hasUnsavedEdits = false;
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[character]);
+}
+
+function makeSlug(value) {
+    return value.normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 80);
+}
+
+function getYouTubeEmbedUrl(value) {
+    try {
+        const url = new URL(value);
+        const host = url.hostname.toLowerCase().replace(/^www\./, "");
+        let id = "";
+        if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
+        else if (["youtube.com", "m.youtube.com", "youtube-nocookie.com"].includes(host)) {
+            const parts = url.pathname.split("/").filter(Boolean);
+            if (url.pathname === "/watch") id = url.searchParams.get("v") || "";
+            else if (["shorts", "embed", "live"].includes(parts[0])) id = parts[1] || "";
+        }
+        return /^[\w-]{6,}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : "";
+    } catch { return ""; }
+}
+
+function formatDate(value) {
+    if (!value) return "Undated";
+    const date = new Date(`${value}T12:00:00`);
+    return new Intl.DateTimeFormat("en", { year: "numeric", month: "long", day: "numeric" }).format(date);
+}
+
+function estimateReadingTime(content) {
+    return Math.max(1, Math.ceil(content.trim().split(/\s+/).filter(Boolean).length / 200));
+}
+
+function renderContent(content) {
+    const lines = String(content || "").trim().split(/\r?\n/);
+    const blocks = [];
+    let paragraph = [];
+    const flushParagraph = () => {
+        if (paragraph.length) blocks.push(`<p>${escapeHtml(paragraph.join("\n")).replace(/\n/g, "<br>")}</p>`);
+        paragraph = [];
+    };
+
+    for (let index = 0; index < lines.length; index++) {
+        const line = lines[index].trim();
+        if (!line) { flushParagraph(); continue; }
+        const fence = line.match(/^(```|''')([\w+-]*)$/);
+        if (fence) {
+            flushParagraph();
+            const codeLines = [];
+            while (++index < lines.length && lines[index].trim() !== fence[1]) codeLines.push(lines[index]);
+            blocks.push(`<pre><code class="language-${escapeHtml(fence[2] || "plaintext")}">${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+            continue;
+        }
+        if (line.startsWith("## ")) { flushParagraph(); blocks.push(`<h3>${escapeHtml(line.slice(3))}</h3>`); continue; }
+        const image = line.match(/^!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)$/i);
+        if (image) { flushParagraph(); blocks.push(`<figure class="blog-media"><img src="${escapeHtml(image[2])}" alt="${escapeHtml(image[1])}" loading="lazy">${image[1] ? `<figcaption>${escapeHtml(image[1])}</figcaption>` : ""}</figure>`); continue; }
+        const video = line.match(/^@\[video\]\((https?:\/\/[^\s)]+)\)$/i);
+        if (video) {
+            flushParagraph();
+            const youtube = getYouTubeEmbedUrl(video[1]);
+            blocks.push(youtube
+                ? `<figure class="blog-media blog-video-embed"><iframe src="${escapeHtml(youtube)}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></figure>`
+                : `<figure class="blog-media"><video controls preload="metadata"><source src="${escapeHtml(video[1])}">Your browser does not support video.</video></figure>`);
+            continue;
+        }
+        paragraph.push(lines[index]);
+    }
+    flushParagraph();
+    return blocks.join("\n");
+}
+
+function collectForm() {
+    return {
+        slug: makeSlug(slugInput.value || titleInput.value),
+        title: titleInput.value.trim(),
+        date: document.getElementById("post-date").value,
+        category: document.getElementById("post-category").value.trim() || "Notes",
+        excerpt: document.getElementById("post-excerpt").value.trim(),
+        content: document.getElementById("post-content").value.trim()
+    };
+}
+
+function updatePreview() {
+    const post = collectForm();
+    preview.innerHTML = `
+        <div class="blog-meta"><span>${escapeHtml(post.category || "Category")}</span><span>${escapeHtml(formatDate(post.date))}</span><span>${estimateReadingTime(post.content)} min read</span></div>
+        <h1 class="blog-title">${escapeHtml(post.title || "Your title")}</h1>
+        <div class="blog-copy">${renderContent(post.content || "Your article will appear here as you write.")}</div>`;
+}
+
+function insertMedia(markup) {
+    const start = contentInput.selectionStart;
+    const end = contentInput.selectionEnd;
+    const before = contentInput.value.slice(0, start);
+    const after = contentInput.value.slice(end);
+    const prefix = before && !before.endsWith("\n\n") ? "\n\n" : "";
+    const suffix = after && !after.startsWith("\n\n") ? "\n\n" : "";
+    contentInput.value = `${before}${prefix}${markup}${suffix}${after}`;
+    contentInput.focus();
+    const cursor = before.length + prefix.length + markup.length;
+    contentInput.setSelectionRange(cursor, cursor);
+    hasUnsavedEdits = true;
+    updatePreview();
+}
+
+document.getElementById("insert-image").addEventListener("click", () => {
+    const url = document.getElementById("media-image-url").value.trim();
+    if (!url) return document.getElementById("media-image-url").focus();
+    const caption = document.getElementById("media-image-caption").value.trim().replace(/\\/g, "\\\\").replace(/\]/g, "\\]");
+    insertMedia(`![${caption}](${url})`);
+});
+
+document.getElementById("insert-video").addEventListener("click", () => {
+    const url = document.getElementById("media-video-url").value.trim();
+    if (!url) return document.getElementById("media-video-url").focus();
+    insertMedia(`@[video](${url})`);
+});
+
+function refreshPicker(selected = activeSlug) {
+    picker.innerHTML = '<option value="">Choose an article</option>';
+    posts.forEach(post => {
+        const option = document.createElement("option");
+        option.value = post.slug;
+        option.textContent = post.title;
+        picker.appendChild(option);
+    });
+    picker.value = selected || "";
+}
+
+function fillForm(post) {
+    titleInput.value = post.title || "";
+    slugInput.value = post.slug || "";
+    document.getElementById("post-category").value = post.category || "";
+    document.getElementById("post-date").value = post.date || new Date().toISOString().slice(0, 10);
+    document.getElementById("post-excerpt").value = post.excerpt || "";
+    document.getElementById("post-content").value = post.content || "";
+    activeSlug = post.slug || null;
+    isNewPost = !post.slug;
+    slugWasEdited = Boolean(post.slug);
+    slugInput.readOnly = Boolean(post.slug);
+    hasUnsavedEdits = false;
+    updatePreview();
+}
+
+async function loadPosts() {
+    if (location.protocol === "file:") {
+        statusLine.textContent = "Open the local site first: run node server.js, then visit http://127.0.0.1:4173/Page/blog-maker.html";
+        return;
+    }
+    try {
+        const response = await fetch(`/api/${typePicker.value}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("The local blog service did not respond.");
+        posts = await response.json();
+        if (!Array.isArray(posts)) throw new Error("The post file has an invalid format.");
+        refreshPicker("");
+        fillForm({ date: new Date().toISOString().slice(0, 10) });
+        picker.disabled = false;
+        newButton.disabled = false;
+        generateButton.disabled = false;
+        statusLine.textContent = `Loaded ${posts.length} post${posts.length === 1 ? "" : "s"}.`;
+    } catch (error) {
+        statusLine.textContent = `${error.message} Start the local site with node server.js, then reopen this page.`;
+    }
+}
+
+async function saveAndGenerate() {
+    const current = collectForm();
+    if (!current.title || !current.slug || !current.content) {
+        statusLine.textContent = "Add a title and some article text first.";
+        return;
+    }
+    const duplicate = posts.find(post => post.slug === current.slug && post.slug !== activeSlug);
+    if (duplicate) {
+        statusLine.textContent = "That page name is already in use. Pick a different one.";
+        return;
+    }
+
+    const nextPosts = [...posts];
+    const index = activeSlug && !isNewPost
+        ? nextPosts.findIndex(post => post.slug === activeSlug)
+        : -1;
+    if (index >= 0) nextPosts[index] = current;
+    else nextPosts.push(current);
+
+    generateButton.disabled = true;
+    statusLine.textContent = "Saving posts and generating HTML…";
+    try {
+        const response = await fetch(`/api/${typePicker.value}/save`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ posts: nextPosts })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.ok) throw new Error(result.error || "Could not generate the blog files.");
+        posts = nextPosts.sort((left, right) => (right.date || "").localeCompare(left.date || ""));
+        activeSlug = current.slug;
+        isNewPost = false;
+        hasUnsavedEdits = false;
+        slugInput.readOnly = true;
+        refreshPicker(activeSlug);
+        statusLine.textContent = `Done. ${result.count} ${typePicker.value === "blogs" ? "blog posts and Blog Library" : "projects and Projects page"} updated.`;
+    } catch (error) {
+        statusLine.textContent = `Could not save: ${error.message}`;
+    } finally {
+        generateButton.disabled = false;
+    }
+}
+
+picker.addEventListener("change", () => {
+    if (hasUnsavedEdits && !window.confirm("This article has changes that are not saved. Switch anyway?")) {
+        picker.value = activeSlug || "";
+        return;
+    }
+    const post = posts.find(item => item.slug === picker.value);
+    if (post) fillForm(post);
+});
+
+typePicker.addEventListener("change", async () => {
+    const previousType = typePicker.value === "blogs" ? "projects" : "blogs";
+    if (hasUnsavedEdits && !window.confirm("This article has changes that are not saved. Switch anyway?")) {
+        typePicker.value = previousType;
+        return;
+    }
+    activeSlug = null;
+    isNewPost = true;
+    slugWasEdited = false;
+    await loadPosts();
+});
+
+newButton.addEventListener("click", () => {
+    if (hasUnsavedEdits && !window.confirm("This article has changes that are not saved. Start a new one anyway?")) return;
+    fillForm({ date: new Date().toISOString().slice(0, 10) });
+    picker.value = "";
+    titleInput.focus();
+});
+
+titleInput.addEventListener("input", () => {
+    if (isNewPost && !slugWasEdited) slugInput.value = makeSlug(titleInput.value);
+    updatePreview();
+});
+slugInput.addEventListener("input", () => { slugWasEdited = true; });
+form.addEventListener("input", () => {
+    hasUnsavedEdits = true;
+    updatePreview();
+});
+form.addEventListener("submit", event => event.preventDefault());
+generateButton.addEventListener("click", saveAndGenerate);
+updatePreview();
+loadPosts();
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script>
+    const previewObserver = new MutationObserver(() => {
+        document.querySelectorAll("#preview-content pre code").forEach(block => window.hljs?.highlightElement(block));
+    });
+    previewObserver.observe(document.getElementById("preview-content"), { childList: true, subtree: true });
+</script>
+</body>
+</html>

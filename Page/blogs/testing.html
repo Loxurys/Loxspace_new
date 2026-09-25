@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="hello"><title>SPACE — Testing</title><link rel="stylesheet" href="../../assets/tailwind.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"></head>
+<body><div class="bg"><canvas id="particles"></canvas><div class="bg-grid"></div><div class="bg-vignette"></div><div class="bg-noise"></div></div>
+<div class="page"><header class="site-header"><a href="../../index.html" class="logo">SPACE</a><a href="../blogs.html" class="header-link">← BLOG LIBRARY</a></header>
+<main class="blog-page"><article class="blog-post"><div class="blog-meta"><span>01</span><span>test</span><span>September 25, 2026</span><span>1 min read</span></div><h1 class="blog-title">Testing</h1><div class="blog-copy"><p>Hello World</p>
+<pre><code class="language-java">System.out.println(&quot;java&quot;);</code></pre>
+<pre><code class="language-c++">cout&gt;&gt;&quot;cpp&quot;;</code></pre>
+<pre><code class="language-python">print(&quot;python&quot;)</code></pre>
+<figure class="blog-media blog-video-embed"><iframe src="https://www.youtube-nocookie.com/embed/WVtQbniRV8M" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></figure>
+<figure class="blog-media"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBB80ukEtJtxGarEsZeyhuD60rFmMVAcoG3AKT_C9stQ&amp;s=10" alt="" loading="lazy"></figure></div></article><section class="comments-section" id="comments" data-type="blog" data-slug="testing">
+<h2>Comments <span class="comments-count" id="comments-count">0</span></h2>
+<form class="comments-form" id="comments-form">
+<label class="comments-field">Name<input name="name" maxlength="48" autocomplete="nickname" required></label>
+<label class="comments-field">Comment<textarea name="message" maxlength="1200" rows="4" required></textarea></label>
+<label class="comments-honeypot" aria-hidden="true">Leave this blank<input name="website" tabindex="-1" autocomplete="off"></label>
+<button class="comments-submit" type="submit">POST COMMENT ↗</button>
+<p class="comments-status" id="comments-status" role="status">No account needed.</p>
+</form>
+<ol class="comments-list" id="comments-list"></ol>
+</section>
+<script>
+(() => {
+    const section = document.getElementById("comments");
+    const form = document.getElementById("comments-form");
+    const list = document.getElementById("comments-list");
+    const status = document.getElementById("comments-status");
+    const count = document.getElementById("comments-count");
+    const query = new URLSearchParams({ type: section.dataset.type, slug: section.dataset.slug });
+    const endpoint = "/.netlify/functions/comments?" + query;
+
+    async function loadComments() {
+        try {
+            const response = await fetch(endpoint);
+            if (!response.ok) throw new Error();
+            const comments = await response.json();
+            list.replaceChildren();
+            count.textContent = String(comments.length);
+            if (!comments.length) {
+                const empty = document.createElement("li");
+                empty.className = "comments-empty";
+                empty.textContent = "No comments yet.";
+                list.append(empty);
+                return;
+            }
+            comments.forEach(comment => {
+                const item = document.createElement("li");
+                item.className = "comment-item";
+                const meta = document.createElement("div");
+                meta.className = "comment-meta";
+                const name = document.createElement("span");
+                name.textContent = comment.name;
+                const date = document.createElement("time");
+                date.dateTime = comment.createdAt;
+                date.textContent = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(comment.createdAt));
+                meta.append(name, date);
+                const message = document.createElement("p");
+                message.textContent = comment.message;
+                item.append(meta, message);
+                list.append(item);
+            });
+        } catch {
+            status.textContent = "Comments are unavailable right now.";
+        }
+    }
+
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const button = form.querySelector("button[type=submit]");
+        const data = new FormData(form);
+        button.disabled = true;
+        status.textContent = "Sending…";
+        try {
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: data.get("name"), message: data.get("message"), website: data.get("website") })
+            });
+            const result = await response.json();
+            if (!response.ok || !result.ok) throw new Error(result.error || "Could not send comment.");
+            form.reset();
+            status.textContent = "Comment posted.";
+            await loadComments();
+        } catch (error) {
+            status.textContent = error.message || "Could not send comment.";
+        } finally {
+            button.disabled = false;
+        }
+    });
+
+    loadComments();
+})();
+</script><a href="../blogs.html" class="blog-back">← All blogs</a></main>
+<footer class="site-footer"><span>SPACE / BLOGS</span><span>EST. 2026</span></footer></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script><script src="../../assets/particles.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script><script>document.querySelectorAll('.blog-copy pre code').forEach(block => window.hljs?.highlightElement(block));</script></body></html>

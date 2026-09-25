@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SPACE — Library</title>
+
+<link rel="stylesheet" href="../assets/tailwind.css">
+</head>
+
+<body>
+
+<div class="bg">
+
+    <canvas id="particles"></canvas>
+
+    <div class="bg-grid"></div>
+    <div class="bg-vignette"></div>
+    <div class="bg-noise"></div>
+
+</div>
+
+<div class="page">
+
+<header class="site-header">
+
+    <a href="../index.html" class="logo">
+        SPACE
+    </a>
+
+    <a href="../index.html" class="header-link">
+        ← HOME
+    </a>
+
+</header>
+
+<main>
+
+<section class="library-hero">
+
+    <span class="eyebrow">
+        DIRECTORY / 001
+    </span>
+
+    <h1 class="display-title">
+        LIBRARY<span>.</span>
+    </h1>
+
+    <p class="body-text">
+        Everything available inside this website.
+        Choose a page to continue.
+    </p>
+
+</section>
+
+<section class="library-controls">
+
+    <div class="search">
+
+        <span>⌕</span>
+
+        <input
+            id="search"
+            type="search"
+            placeholder="Search pages..."
+            autocomplete="off"
+        >
+
+    </div>
+
+    <div class="page-count">
+        <span id="count">0</span> PAGES
+    </div>
+
+</section>
+
+<section
+    id="pages"
+    class="library-grid">
+</section>
+
+<div
+    id="empty"
+    class="empty-state">
+    NO PAGE FOUND.
+</div>
+
+</main>
+
+<footer class="site-footer">
+    <span>LIBRARY</span>
+    <span id="year"></span>
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script>
+
+const pages = [
+
+    {
+        number: "01",
+        title: "About",
+        description:
+            "Information and introduction.",
+        url: "about.html"
+    },
+
+    {
+        number: "02",
+        title: "Projects",
+        description:
+            "Things that have been built.",
+        url: "projects.html"
+    },
+
+    {
+        number: "03",
+        title: "Gallery",
+        description:
+            "A collection of visual work.",
+        url: "gallery.html"
+    },
+
+    {
+        number: "04",
+        title: "Contact",
+        description:
+            "Get in touch.",
+        url: "contact.html"
+    },
+
+    {
+        number: "05",
+        title: "Blog Library",
+        description:
+            "Browse and read all blog posts.",
+        url: "blog.html"
+    }
+
+];
+
+const list =
+    document.getElementById("pages");
+
+const search =
+    document.getElementById("search");
+
+const count =
+    document.getElementById("count");
+
+const empty =
+    document.getElementById("empty");
+
+
+function render(filter = "") {
+
+    const query =
+        filter
+            .trim()
+            .toLowerCase();
+
+    const result =
+        pages.filter(page =>
+            page.title
+                .toLowerCase()
+                .includes(query)
+
+            ||
+
+            page.description
+                .toLowerCase()
+                .includes(query)
+        );
+
+    list.innerHTML = "";
+
+    count.textContent =
+        result.length;
+
+    empty.classList.toggle(
+        "show",
+        result.length === 0
+    );
+
+    result.forEach(page => {
+
+        const card =
+            document.createElement("a");
+
+        card.className =
+            "library-card";
+
+        card.href =
+            page.url;
+
+        card.innerHTML = `
+
+            <div class="library-card-top">
+
+                <span>
+                    ${page.number}
+                </span>
+
+                <span class="library-card-arrow">
+                    ↗
+                </span>
+
+            </div>
+
+            <div>
+
+                <div class="library-card-title">
+                    ${page.title}
+                </div>
+
+                <div class="library-card-description">
+                    ${page.description}
+                </div>
+
+            </div>
+
+        `;
+
+        list.appendChild(card);
+
+        card.addEventListener(
+            "pointermove",
+            event => {
+
+                const rect =
+                    card.getBoundingClientRect();
+
+                card.style.setProperty(
+                    "--mouse-x",
+                    `${event.clientX - rect.left}px`
+                );
+
+                card.style.setProperty(
+                    "--mouse-y",
+                    `${event.clientY - rect.top}px`
+                );
+            }
+        );
+    });
+}
+
+search.addEventListener(
+    "input",
+    event => {
+        render(event.target.value);
+    }
+);
+
+document.getElementById("year")
+    .textContent =
+    new Date().getFullYear();
+
+render();
+
+
+/* THREE.JS */
+</script>
+<script src="../assets/particles.js"></script>
+
+</body>
+</html>

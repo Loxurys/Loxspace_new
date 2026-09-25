@@ -1,0 +1,22 @@
+{
+  "name": "loxspace",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev:netlify": "netlify dev",
+    "build:css": "tailwindcss -i ./assets/tailwind.input.css -o ./assets/tailwind.css",
+    "build:netlify": "npm run build:css && node scripts/build-site.js",
+    "watch:css": "tailwindcss -i ./assets/tailwind.input.css -o ./assets/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "netlify-cli": "^27.10.0",
+    "tailwindcss": "^4.3.0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

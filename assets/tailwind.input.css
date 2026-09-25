@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@source "../index.html";
+@source "../Page";
+
+/* Custom effects and detailed page components. */
+@import "./style.css";
+
+/* Keep scrolling enabled while hiding the browser scrollbar. */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Shared layout and type use Tailwind utilities. */
+html {
+  @apply min-h-full scroll-smooth bg-[#050505];
+}
+
+body {
+  @apply min-h-screen overflow-x-hidden bg-[#050505] text-[#f5f5f5];
+  font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+.page {
+  @apply relative z-[2] mx-auto flex min-h-screen w-full max-w-[1100px] flex-col p-7;
+}
+
+.site-header {
+  @apply relative z-10 flex items-center justify-between;
+}
+
+.logo {
+  @apply text-[13px] font-bold tracking-[.2em] text-[#f5f5f5] transition-opacity duration-[250ms] ease-[ease] hover:opacity-[.65];
+}
+
+.header-link {
+  @apply text-[10px] tracking-[.15em] text-[#777] transition-colors duration-[250ms] ease-[ease] hover:text-[#f5f5f5];
+}
+
+.status {
+  @apply flex items-center gap-2 text-[10px] tracking-[.15em] text-[#777];
+}
+
+.status-dot {
+  @apply h-[6px] w-[6px] rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,.9)];
+}
+
+.eyebrow {
+  @apply mb-[18px] block text-[10px] tracking-[.25em] text-[#777];
+}
+
+.display-title {
+  @apply text-[clamp(55px,10vw,120px)] font-semibold leading-[.86] tracking-[-.075em];
+}
+
+.display-title span {
+  @apply text-[#555];
+}
+
+.home-title {
+  @apply text-[clamp(46px,8vw,96px)];
+}
+
+.body-text {
+  @apply max-w-[470px] text-sm leading-[1.7] text-[#777];
+}
+
+.hero {
+  @apply flex flex-1 flex-col justify-center pt-[clamp(75px,12vh,130px)] pb-[70px];
+}
+
+.hero .body-text {
+  @apply mt-[30px];
+}
+
+.nav-grid {
+  @apply mt-[60px] grid grid-cols-4 gap-px border-0 bg-transparent;
+}
+
+.site-footer {
+  @apply mt-[80px] flex justify-between py-[25px] text-[9px] tracking-[.15em] text-[#555];
+}
+
+@media (max-width: 900px) {
+  .nav-grid {
+    @apply grid-cols-2;
+  }
+}
+
+@media (max-width: 500px) {
+  .page {
+    @apply p-[22px];
+  }
+
+  .hero {
+    @apply pt-[75px];
+  }
+
+  .nav-grid {
+    @apply grid-cols-1;
+  }
+
+  .display-title {
+    @apply text-[clamp(52px,17vw,85px)];
+  }
+
+  .home-title {
+    @apply text-[clamp(40px,10vw,64px)];
+  }
+}

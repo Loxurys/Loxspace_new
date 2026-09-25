@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SPACE — Home</title>
+
+<link rel="stylesheet" href="assets/tailwind.css">
+</head>
+
+<body>
+
+<div class="bg">
+
+    <canvas id="particles"></canvas>
+
+    <div class="bg-grid"></div>
+    <div class="bg-vignette"></div>
+    <div class="bg-noise"></div>
+
+</div>
+
+<div class="page">
+
+<header class="site-header">
+
+    <a href="index.html" class="logo">
+        SPACE
+    </a>
+
+    <div class="status">
+        <span class="status-dot"></span>
+        <span>ONLINE SINCE <span id="uptime">0D 00:00:00</span> AGO</span>
+    </div>
+
+</header>
+
+<main class="hero">
+
+    <span class="eyebrow">
+        WELCOME / LOXSPACE
+    </span>
+
+    <h1 class="display-title home-title">
+        WELCOME TO<br>
+        <span>LOXSPACE.</span>
+    </h1>
+
+    <p class="body-text">
+        A personal space for projects, experiments, useful finds,
+        and random things I stumble across.
+    </p>
+
+    <nav class="nav-grid">
+
+        <a href="Page/about.html" class="nav-card">
+            <span class="card-number">01</span>
+            <span class="card-arrow">↗</span>
+            <span class="card-title">About</span>
+        </a>
+
+        <a href="Page/library.html" class="nav-card">
+            <span class="card-number">02</span>
+            <span class="card-arrow">↗</span>
+            <span class="card-title">Library</span>
+        </a>
+
+        <a href="Page/projects.html" class="nav-card">
+            <span class="card-number">03</span>
+            <span class="card-arrow">↗</span>
+            <span class="card-title">Projects</span>
+        </a>
+
+        <a href="Page/blog.html" class="nav-card">
+            <span class="card-number">04</span>
+            <span class="card-arrow">↗</span>
+            <span class="card-title">Blog Library</span>
+        </a>
+
+    </nav>
+
+</main>
+
+<footer class="site-footer">
+    <span>EST. 2026</span>
+    <span>HOME / 01</span>
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script src="assets/particles.js"></script>
+
+<script>
+
+/* CARD MOUSE EFFECT */
+
+document
+    .querySelectorAll(".nav-card")
+    .forEach(card => {
+
+        card.addEventListener(
+            "pointermove",
+            event => {
+
+                const rect =
+                    card.getBoundingClientRect();
+
+                card.style.setProperty(
+                    "--mouse-x",
+                    `${event.clientX - rect.left}px`
+                );
+
+                card.style.setProperty(
+                    "--mouse-y",
+                    `${event.clientY - rect.top}px`
+                );
+            }
+        );
+    });
+
+</script>
+
+<script>
+    const onlineSince = new Date(2026, 8, 24, 1, 49, 24);
+    const uptime = document.getElementById("uptime");
+
+    function updateUptime() {
+        const elapsed = Math.max(0, Math.floor((Date.now() - onlineSince.getTime()) / 1000));
+        const days = Math.floor(elapsed / 86400);
+        const hours = Math.floor((elapsed % 86400) / 3600);
+        const minutes = Math.floor((elapsed % 3600) / 60);
+        const seconds = elapsed % 60;
+        uptime.textContent = `${days}D ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    updateUptime();
+    setInterval(updateUptime, 1000);
+</script>
+
+</body>
+</html>
