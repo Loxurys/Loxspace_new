@@ -26,16 +26,38 @@
     const count = document.getElementById("comments-count");
     const messageField = form.elements.message;
     const characterCount = document.getElementById("comments-char-count");
+    let displayedComments = 0;
+    let renderVersion = 0;
     const query = new URLSearchParams({ type: section.dataset.type, slug: section.dataset.slug });
     const endpoint = "/.netlify/functions/comments?" + query;
 
+    function appendComment(comment) {
+        const item = document.createElement("li");
+        item.className = "comment-item";
+        const meta = document.createElement("div");
+        meta.className = "comment-meta";
+        const name = document.createElement("span");
+        name.textContent = comment.name;
+        const date = document.createElement("time");
+        date.dateTime = comment.createdAt;
+        date.textContent = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(comment.createdAt));
+        meta.append(name, date);
+        const message = document.createElement("p");
+        message.textContent = comment.message;
+        item.append(meta, message);
+        list.append(item);
+    }
+
     async function loadComments() {
+        const version = ++renderVersion;
         try {
-            const response = await fetch(endpoint);
+            const response = await fetch(endpoint, { cache: "no-store" });
             if (!response.ok) throw new Error();
             const comments = await response.json();
+            if (version !== renderVersion) return;
             list.replaceChildren();
-            count.textContent = String(comments.length);
+            displayedComments = comments.length;
+            count.textContent = String(displayedComments);
             if (!comments.length) {
                 const empty = document.createElement("li");
                 empty.className = "comments-empty";
@@ -43,24 +65,9 @@
                 list.append(empty);
                 return;
             }
-            comments.forEach(comment => {
-                const item = document.createElement("li");
-                item.className = "comment-item";
-                const meta = document.createElement("div");
-                meta.className = "comment-meta";
-                const name = document.createElement("span");
-                name.textContent = comment.name;
-                const date = document.createElement("time");
-                date.dateTime = comment.createdAt;
-                date.textContent = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(comment.createdAt));
-                meta.append(name, date);
-                const message = document.createElement("p");
-                message.textContent = comment.message;
-                item.append(meta, message);
-                list.append(item);
-            });
+            comments.forEach(appendComment);
         } catch {
-            status.textContent = "Comments are unavailable right now.";
+            if (version === renderVersion) status.textContent = "Comments are unavailable right now.";
         }
     }
 
@@ -85,7 +92,11 @@
             form.reset();
             characterCount.textContent = "0";
             status.textContent = "Comment posted.";
-            await loadComments();
+            renderVersion++;
+            list.querySelector(".comments-empty")?.remove();
+            appendComment(result.comment);
+            displayedComments++;
+            count.textContent = String(displayedComments);
         } catch (error) {
             status.textContent = error.message || "Could not send comment.";
         } finally {
