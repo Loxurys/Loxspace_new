@@ -9,22 +9,6 @@ const excludedPageFiles = new Set([
     "project-posts.json"
 ]);
 
-async function countHtmlFiles(directory) {
-    let count = 0;
-    let entries;
-    try {
-        entries = await fs.readdir(directory, { withFileTypes: true });
-    } catch {
-        return 0;
-    }
-    for (const entry of entries) {
-        const entryPath = path.join(directory, entry.name);
-        if (entry.isDirectory()) count += await countHtmlFiles(entryPath);
-        else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) count++;
-    }
-    return count;
-}
-
 async function copyTree(source, destination, relative = "") {
     await fs.mkdir(destination, { recursive: true });
     for (const entry of await fs.readdir(source, { withFileTypes: true })) {
@@ -54,22 +38,6 @@ async function main() {
         html = html.replace(/<a href="blog-maker\.html" class="header-link">BLOG MAKER ↗<\/a>/g, "");
         await fs.writeFile(file, html, "utf8");
     }
-
-    const factsFile = path.join(root, "Page", "web-facts.json");
-    let previousFacts = {};
-    try { previousFacts = JSON.parse(await fs.readFile(factsFile, "utf8")); } catch {}
-    const isProductionBuild = process.env.NETLIFY === "true" && process.env.CONTEXT === "production";
-    const facts = {
-        publicPages: await countHtmlFiles(output),
-        blogPosts: await countHtmlFiles(path.join(output, "Page", "blogs")),
-        projects: await countHtmlFiles(path.join(output, "Page", "projects")),
-        lastProductionUpdate: isProductionBuild
-            ? new Date().toISOString()
-            : previousFacts.lastProductionUpdate || null
-    };
-    const factsJson = `${JSON.stringify(facts, null, 2)}\n`;
-    await fs.writeFile(factsFile, factsJson, "utf8");
-    await fs.writeFile(path.join(output, "Page", "web-facts.json"), factsJson, "utf8");
 
     console.log("Netlify site built in dist/ (local Blog Maker excluded).");
 }
