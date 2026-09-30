@@ -83,8 +83,9 @@
           <button class="filter-option" data-filter="cool" type="button"><span class="filter-swatch swatch-cool"></span><span>Cool</span><span class="filter-check">✓</span></button>
         </div>
         <div class="timer-control"><label for="timerSelect">TIMER</label><select id="timerSelect"><option value="0">Langsung</option><option value="3" selected>3 detik</option><option value="5">5 detik</option><option value="10">10 detik</option></select></div>
-        <div class="pro-controls">
-          <p class="eyebrow">BOOTH ENGINEERING</p>
+          <details class="pro-controls" id="advancedControls" open>
+          <summary class="eyebrow">PENGATURAN LANJUTAN <span class="advanced-chevron" aria-hidden="true">⌄</span></summary>
+          <div class="pro-controls-content">
           <div class="pro-control"><label for="sessionSelect">JUMLAH FOTO</label><select id="sessionSelect"><option value="1">Solo portrait</option><option value="4" selected>Classic 4 shot</option><option value="6">Chaos 6 shot</option><option value="8">Extended 8 shot</option></select></div>
           <div class="pro-control"><label for="layoutSelect">PRINT LAYOUT</label><select id="layoutSelect"><option value="strip" selected>Long strip</option><option value="grid">2 × 2 contact sheet</option></select></div>
           <div class="pro-control"><label for="skinSelect">PAPER STOCK</label><select id="skinSelect"><option value="cream">Cream receipt</option><option value="pink">Bubblegum</option><option value="dark">Midnight matte</option><option value="blue">Poolside</option></select></div>
@@ -92,8 +93,9 @@
           <div class="pro-control caption-control"><label for="captionInput">STRIP CAPTION</label><input id="captionInput" maxlength="28" value="BEST DAY EVER" placeholder="Tulis caption..."></div>
           <label class="toggle-row"><span>Shutter sound</span><input id="soundToggle" type="checkbox" checked><span class="toggle-ui"></span></label>
           <div class="zoom-control" id="zoomControl" hidden><label for="zoomRange">CAMERA ZOOM <span id="zoomValue">1.0×</span></label><input id="zoomRange" type="range" min="1" max="1" step="0.1" value="1"></div>
+          </div>
+          </details>
         </div>
-      </div>
       <p class="privacy-note"><span>◉</span> Foto diproses di browser lo. Nggak di-upload ke mana-mana. <kbd>SPACE</kbd> buat jepret.</p>
     </aside>
   </main>

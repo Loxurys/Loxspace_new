@@ -13,6 +13,7 @@ const stripCanvas = document.querySelector('#stripCanvas');
 const photosNode = document.querySelector('#stripPhotos');
 const stripEmpty = document.querySelector('#stripEmpty');
 const timerSelect = document.querySelector('#timerSelect');
+const advancedControls = document.querySelector('#advancedControls');
 const countdown = document.querySelector('#countdown');
 const photos = [];
 const filters = { none: '', mono: 'grayscale(1)', warm: 'sepia(.45) saturate(1.2)', cool: 'hue-rotate(175deg) saturate(.7)' };
@@ -89,6 +90,44 @@ function showCameraError(message) {
 
 function activeFilter() { return filters[currentFilter] || ''; }
 
+function drawPhotoOverlay(ctx, width, height, shotNumber) {
+  const unit = Math.min(width, height);
+  const inset = unit * 0.05;
+  const arm = unit * 0.05;
+  const right = width - inset;
+  const bottom = height - inset;
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,.82)';
+  ctx.lineWidth = Math.max(2, unit * 0.0025);
+  ctx.lineCap = 'square';
+  ctx.shadowColor = 'rgba(0,0,0,.55)';
+  ctx.shadowBlur = unit * 0.008;
+  ctx.beginPath();
+  ctx.moveTo(inset, inset + arm); ctx.lineTo(inset, inset); ctx.lineTo(inset + arm, inset);
+  ctx.moveTo(right - arm, inset); ctx.lineTo(right, inset); ctx.lineTo(right, inset + arm);
+  ctx.moveTo(inset, bottom - arm); ctx.lineTo(inset, bottom); ctx.lineTo(inset + arm, bottom);
+  ctx.moveTo(right - arm, bottom); ctx.lineTo(right, bottom); ctx.lineTo(right, bottom - arm);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255,255,255,.84)';
+  ctx.font = `500 ${Math.round(unit * 0.022)}px "DM Mono", monospace`;
+  ctx.textBaseline = 'bottom';
+  ctx.textAlign = 'left';
+  ctx.fillText(`SHOT ${String(shotNumber).padStart(2, '0')} / ${String(shotsTarget).padStart(2, '0')}`, inset, height - inset * 0.32);
+  ctx.textAlign = 'right';
+  ctx.fillText('FLASH CAM™', right, height - inset * 0.32);
+  ctx.restore();
+}
+
+function flashCapture() {
+  stage.classList.remove('flash');
+  void stage.offsetWidth;
+  stage.classList.add('flash');
+  setTimeout(() => stage.classList.remove('flash'), 240);
+  if ('vibrate' in navigator) navigator.vibrate(18);
+}
+
 async function capture() {
   if (!stream || (photos.length >= shotsTarget && replaceIndex === null)) return;
   const seconds = Number(timerSelect.value);
@@ -118,6 +157,9 @@ async function capture() {
   ctx.filter = activeFilter();
   ctx.drawImage(video, 0, 0, width, height);
   ctx.restore();
+  const shotNumber = replaceIndex !== null ? replaceIndex + 1 : photos.length + 1;
+  flashCapture();
+  drawPhotoOverlay(ctx, width, height, shotNumber);
   const image = captureCanvas.toDataURL('image/jpeg', .94);
   if (replaceIndex !== null) {
     photos[replaceIndex] = image;
@@ -137,6 +179,7 @@ async function capture() {
     flipButton.disabled = true;
     cameraSelect.disabled = true;
     setStatus(false, 'SESI SELESAI');
+    document.querySelector('#captureHint').textContent = 'Sesi selesai · tap foto buat retake atau download strip.';
   } else captureButton.disabled = false;
   if (!autoRunning) {
     document.querySelector('#manualMode').disabled = false;
@@ -399,4 +442,6 @@ document.addEventListener('keydown', (event) => {
   if (event.code === 'Space' && !editing && !captureButton.disabled) { event.preventDefault(); handleShutter(); }
 });
 if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventListener('devicechange', listCameras);
+if (window.matchMedia('(max-width: 680px)').matches) advancedControls.open = false;
+window.addEventListener('pagehide', () => stream?.getTracks().forEach((track) => track.stop()));
 document.querySelector('#stripDate').textContent = '';
