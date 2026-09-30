@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171716">
+  <title>FLASH — Photo Booth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Flash Photo Booth">
+      <span class="brand-mark" aria-hidden="true">✳</span><span>FLASH</span><span class="brand-tag">PHOTO BOOTH</span>
+    </a>
+    <div class="top-right"><span class="live-dot"></span><span id="cameraStatus">KAMERA BELUM AKTIF</span></div>
+  </header>
+
+  <main class="layout">
+    <section class="studio" aria-label="Studio foto">
+      <div class="studio-heading">
+        <div><p class="eyebrow">STUDIO / 001</p><h1>Pose dulu.<br><span>Jangan kaku.</span></h1></div>
+        <div class="frame-label"><span>● REC READY</span><span>4:3 / PORTRAIT</span></div>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="stage" id="stage">
+          <video id="video" autoplay playsinline muted></video>
+          <img id="previewImage" alt="Hasil foto sementara">
+          <div class="stage-overlay" id="stageOverlay">
+            <div class="camera-icon" aria-hidden="true">◎</div>
+            <p id="overlayTitle">Kamera lo belum nyala</p>
+            <span id="overlayText">Izinin akses kamera buat mulai.</span>
+            <button class="button button-light" id="startButton" type="button">AKTIFKAN KAMERA <span>↗</span></button>
+          </div>
+          <div class="countdown" id="countdown" aria-live="assertive"></div>
+          <div class="stage-corner corner-tl"></div><div class="stage-corner corner-tr"></div>
+          <div class="stage-corner corner-bl"></div><div class="stage-corner corner-br"></div>
+          <div class="stage-caption"><span id="shotCount">SHOT 00 / 04</span><span>FLASH CAM™</span></div>
+        </div>
+      </div>
+
+      <div class="capture-dock">
+        <div class="shoot-mode" role="group" aria-label="Mode pemotretan">
+          <button class="mode-button active" id="manualMode" type="button" aria-pressed="true"><span>01</span> MANUAL</button>
+          <button class="mode-button" id="autoMode" type="button" aria-pressed="false"><span>04</span> AUTO · 4 FOTO</button>
+        </div>
+        <div class="capture-row">
+          <div class="camera-picker">
+            <label for="cameraSelect">CAMERA</label>
+            <select id="cameraSelect" aria-label="Pilih kamera" disabled><option value="">Kamera otomatis</option></select>
+          </div>
+          <button class="shutter" id="captureButton" type="button" aria-label="Ambil foto" disabled><span></span></button>
+          <button class="flip-button" id="flipButton" type="button" aria-label="Balik kamera" title="Balik kamera" disabled>↻</button>
+        </div>
+        <p class="capture-hint" id="captureHint">Klik tombol tengah buat jepret · 4 foto per strip</p>
+      </div>
+    </section>
+
+    <aside class="side-panel">
+      <div class="panel-block">
+        <div class="section-head"><div><p class="eyebrow">YOUR SESSION</p><h2>Photo strip</h2></div><span class="counter" id="counter">0/4</span></div>
+        <div class="strip-card" id="stripCard">
+          <div class="strip-empty" id="stripEmpty"><span>✳</span><p>Hasil foto bakal<br>nongol di sini.</p></div>
+          <div class="strip-photos" id="stripPhotos" aria-label="Hasil foto"></div>
+          <div class="strip-footer"><span id="stripFooter">FLASH BOOTH</span><span id="stripDate"></span></div>
+        </div>
+        <div class="strip-actions">
+          <button class="button button-dark" id="downloadButton" type="button" disabled>DOWNLOAD STRIP <span>↓</span></button>
+          <button class="icon-button" id="resetButton" type="button" title="Ulang sesi" aria-label="Ulang sesi" disabled>↺</button>
+        </div>
+      </div>
+
+      <div class="panel-block settings-block">
+        <div class="section-head"><div><p class="eyebrow">MAKE IT YOURS</p><h2>Atur mood</h2></div></div>
+        <div class="filter-list" role="group" aria-label="Pilih filter">
+          <button class="filter-option active" data-filter="none" type="button"><span class="filter-swatch swatch-original"></span><span>Original</span><span class="filter-check">✓</span></button>
+          <button class="filter-option" data-filter="mono" type="button"><span class="filter-swatch swatch-mono"></span><span>Mono</span><span class="filter-check">✓</span></button>
+          <button class="filter-option" data-filter="warm" type="button"><span class="filter-swatch swatch-warm"></span><span>Warm</span><span class="filter-check">✓</span></button>
+          <button class="filter-option" data-filter="cool" type="button"><span class="filter-swatch swatch-cool"></span><span>Cool</span><span class="filter-check">✓</span></button>
+        </div>
+        <div class="timer-control"><label for="timerSelect">TIMER</label><select id="timerSelect"><option value="0">Langsung</option><option value="3" selected>3 detik</option><option value="5">5 detik</option><option value="10">10 detik</option></select></div>
+        <div class="pro-controls">
+          <p class="eyebrow">BOOTH ENGINEERING</p>
+          <div class="pro-control"><label for="sessionSelect">JUMLAH FOTO</label><select id="sessionSelect"><option value="1">Solo portrait</option><option value="4" selected>Classic 4 shot</option><option value="6">Chaos 6 shot</option><option value="8">Extended 8 shot</option></select></div>
+          <div class="pro-control"><label for="layoutSelect">PRINT LAYOUT</label><select id="layoutSelect"><option value="strip" selected>Long strip</option><option value="grid">2 × 2 contact sheet</option></select></div>
+          <div class="pro-control"><label for="skinSelect">PAPER STOCK</label><select id="skinSelect"><option value="cream">Cream receipt</option><option value="pink">Bubblegum</option><option value="dark">Midnight matte</option><option value="blue">Poolside</option></select></div>
+          <div class="pro-control"><label for="stickerSelect">STICKER STAMP</label><select id="stickerSelect"><option value="">No sticker</option><option value="✦">Sparkle ✦</option><option value="♥">Heart ♥</option><option value="★">Star ★</option><option value="☻">Smiley ☻</option><option value="☼">Sun ☼</option></select></div>
+          <div class="pro-control caption-control"><label for="captionInput">STRIP CAPTION</label><input id="captionInput" maxlength="28" value="BEST DAY EVER" placeholder="Tulis caption..."></div>
+          <label class="toggle-row"><span>Shutter sound</span><input id="soundToggle" type="checkbox" checked><span class="toggle-ui"></span></label>
+          <div class="zoom-control" id="zoomControl" hidden><label for="zoomRange">CAMERA ZOOM <span id="zoomValue">1.0×</span></label><input id="zoomRange" type="range" min="1" max="1" step="0.1" value="1"></div>
+        </div>
+      </div>
+      <p class="privacy-note"><span>◉</span> Foto diproses di browser lo. Nggak di-upload ke mana-mana. <kbd>SPACE</kbd> buat jepret.</p>
+    </aside>
+  </main>
+  <canvas id="captureCanvas" hidden></canvas>
+  <canvas id="stripCanvas" hidden></canvas>
+</body>
+</html>

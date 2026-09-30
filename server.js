@@ -358,7 +358,11 @@ async function serveFile(request, response, pathname) {
         send(response, 404, "Not found", "text/plain; charset=utf-8");
         return;
     }
-    if (!["index.html", "404.html", "Page", "assets"].includes(topLevel)) {
+    if (!["index.html", "404.html", "Page", "assets", "unreleased"].includes(topLevel)) {
+        await sendNotFound(request, response);
+        return;
+    }
+    if (!["index.html", "404.html", "Page", "assets", "unreleased"].includes(topLevel)) {
         await sendNotFound(request, response);
         return;
     }

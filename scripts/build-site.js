@@ -31,6 +31,7 @@ async function main() {
     await fs.copyFile(path.join(root, "404.html"), path.join(output, "404.html"));
     await copyTree(path.join(root, "assets"), path.join(output, "assets"), "assets");
     await copyTree(path.join(root, "Page"), path.join(output, "Page"), "Page");
+    await copyTree(path.join(root, "unreleased"), path.join(output, "unreleased"), "unreleased");
 
     for (const page of ["blog.html", "projects.html"]) {
         const file = path.join(output, "Page", page);
